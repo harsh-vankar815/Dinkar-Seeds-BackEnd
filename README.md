@@ -10,3 +10,4 @@ app.get("/api/profile", protect, (req, res) => {
     user: req.user,
   });
 });
+goot
