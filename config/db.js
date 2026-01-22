@@ -1,10 +1,11 @@
 const mongoose = require("mongoose");
 
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://localhost:27017/dinkarSeedsDB";
+
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      process.env.MONGO_URI || "mongodb://localhost:27017/dinkarSeedsDB",
-    );
+    await mongoose.connect(MONGO_URI);
     console.log("mongoDB connected");
   } catch (err) {
     console.error(err);

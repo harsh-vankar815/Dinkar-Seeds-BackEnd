@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const { errorHandler } = require("./middlewares/errorMiddleware");
+const { protect } = require("./middlewares/authMiddleware");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -33,6 +34,14 @@ connectDB();
 app.get("/", (req, res) => {
   res.send("API is running...");
 });
+
+// yaha pe testing ho rahi hai ki user successfully profile page login hone ke baad access kar pa raha hai ya nahi
+// app.get("/api/profile", protect, (req, res) => {
+//   res.json({
+//     success: true,
+//     user: req.user,
+//   });
+// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
