@@ -17,4 +17,8 @@ app.get("/api/profile", protect, (req, res) => {
 
 /api/auth/login
 /api/auth/register
+/api/auth/refresh-token
+/api/auth/logout
 
+// testing route authentication is working or not
+/api/profile
