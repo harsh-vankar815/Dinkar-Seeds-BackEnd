@@ -1,9 +1,15 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require("../utils/generateToken");
 
-const JWT_SECRET = process.env.JWT_SECRET
+const NODE_ENV = process.env.NODE_ENV;
+const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_TOKEN;
 
+// register api
 exports.register = async (req, res) => {
   try {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
@@ -48,6 +54,7 @@ exports.register = async (req, res) => {
   }
 };
 
+// login
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -70,16 +77,21 @@ exports.login = async (req, res) => {
     }
 
     // generating token
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: "1h" },
-    );
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
+
+    // httpOnly Cookies for more secure authentication
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: NODE_ENV === "production", // Sirf production (HTTPS) par true hoga
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.json({
       message: "Login successfull",
       success: true,
-      token,
+      accessToken,
       user: {
         id: user._id,
         firstName: user.firstName,
@@ -92,4 +104,37 @@ exports.login = async (req, res) => {
     console.error(`Login error: ${err}`);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+// refresh token api
+exports.refreshToken = async (req, res) => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    return res.status(401).json({ message: "Refresh token missing" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_REFRESH_TOKEN);
+
+    const user = await User.findById(decoded.id);
+    if (!user ) return res.status(404).json({ message: "User not found"})
+
+    const newAccessToken = generateAccessToken(user)
+
+    res.json({ accesstoken: newAccessToken });
+  } catch (err) {
+    console.error(`refresh token error: ${err}`);
+    return res.status(403).json({ message: "Invalid refresh token" });
+  }
+};
+
+// logout api , clearing cookies
+exports.logout = (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+
+  res.json({ success: true, message: "Logged out successfully" });
 };
