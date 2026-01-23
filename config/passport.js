@@ -11,7 +11,7 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        const email = profile.emails[0].value;
+        const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
         // Checking ki kya user googleId ya email se already loggedin hai ki nahi
         let user = await User.findOne({
           $or: [{ googleId: profile.id }, { email }],
