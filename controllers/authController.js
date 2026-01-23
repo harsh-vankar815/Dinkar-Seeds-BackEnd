@@ -5,9 +5,32 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/generateToken");
-
 const NODE_ENV = process.env.NODE_ENV;
 const JWT_REFRESH_TOKEN = process.env.JWT_REFRESH_TOKEN;
+
+// google auth
+exports.googleAuthSuccess = (req, res) => {
+  const user = req.user;
+
+  if (!user) {
+    res.clearCookie("refreshToken");
+    return res.redirect(`${process.env.CLIENT_URL}/login`);
+  }
+
+  const refreshToken = generateRefreshToken(user);
+
+  // saving securely refresh token in httpOnly cookies
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: NODE_ENV === "production",
+    sameSite: "strict",
+    // sameSite: "None", // Required for cross-site (Render/Cloud)
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  });
+
+  // redirect to frontned profile page
+  res.redirect(`${process.env.CLIENT_URL}/profile`);
+};
 
 // register api
 exports.register = async (req, res) => {
@@ -118,9 +141,9 @@ exports.refreshToken = async (req, res) => {
     const decoded = jwt.verify(token, JWT_REFRESH_TOKEN);
 
     const user = await User.findById(decoded.id);
-    if (!user ) return res.status(404).json({ message: "User not found"})
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-    const newAccessToken = generateAccessToken(user)
+    const newAccessToken = generateAccessToken(user);
 
     res.json({ accesstoken: newAccessToken });
   } catch (err) {

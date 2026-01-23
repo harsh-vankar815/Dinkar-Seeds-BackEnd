@@ -5,6 +5,8 @@ const connectDB = require("./config/db");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const passport = require("passport");
+require("./config/passport");
 const authRoutes = require("./routes/authRoutes");
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const { protect } = require("./middlewares/authMiddleware");
@@ -14,15 +16,17 @@ const PORT = process.env.PORT || 5000;
 // middlewares
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "*",
-    credentials: true,
-  }),
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // frontend URL
+    credentials: true, // cookies allow
+  })
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet()); // adds all default security headers
+app.use(helmet()) // adds all default security headers
 // Log requests in 'dev' format
 app.use(morgan("dev"));
+
+app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);
 
