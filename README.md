@@ -28,3 +28,5 @@ app.get("/api/profile", protect, (req, res) => {
 
 // testing route authentication is working or not
 /api/profile
+/api/profile/me
+/api/profile/update

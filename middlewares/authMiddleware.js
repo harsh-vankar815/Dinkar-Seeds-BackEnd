@@ -6,7 +6,7 @@ const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 exports.protect = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization?.startsWith("Bearer")) {
+  if (req.headers.authorization?.startsWith("Bearer ")) {
     token = req.headers.authorization.split(" ")[1];
   }
 

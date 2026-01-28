@@ -47,6 +47,16 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+
+    bio: {
+      type: String,
+      default: "",
+    },
+
+    image: {
+      type: String,
+      default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK-5-DUAn8F-Uj_pHNDRyprT6W7FV4WVEBtw&s"
+    }
   },
   { timestamps: true },
 );
