@@ -10,7 +10,7 @@ const passport = require("passport");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes")
 const { errorHandler } = require("./middlewares/errorMiddleware");
-const { protect } = require("./middlewares/authMiddleware");
+const productRoutes = require("./routes/productRoutes")
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -34,6 +34,7 @@ app.use(passport.initialize());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes)
+app.use("/api/products", productRoutes)
 
 // error middleware (last me)
 app.use(errorHandler);
@@ -44,13 +45,6 @@ app.get("/", (req, res) => {
   res.send("API is running...");
 });
 
-// // yaha pe testing ho rahi hai ki user successfully profile page login hone ke baad access kar pa raha hai ya nahi
-// app.get("/api/profile", protect, (req, res) => {
-//   res.json({
-//     success: true,
-//     user: req.user,
-//   });
-// });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
