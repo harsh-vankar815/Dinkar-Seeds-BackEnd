@@ -2,27 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const { protect } = require("../middlewares/authMiddleware");
-const multer = require("multer");
-const path = require('path')
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${req.user._id}-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
-
-const upload = multer({
-  storage,
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith("image")) {
-      cb(new Error("Please upload an image"));
-    }
-    cb(null, true);
-  },
-});
+const uploadProfileImage = require('../middlewares/uploadProfileImage')
 
 // get profile
 router.get("/me", protect, async (req, res) => {
@@ -33,7 +13,7 @@ router.get("/me", protect, async (req, res) => {
 });
 
 // update profile
-router.put("/update", protect, upload.single("image"), async (req, res) => {
+router.put("/update", protect, uploadProfileImage.single("image"), async (req, res) => {
   try {
     const { firstName, lastName, bio } = req.body;
     console.log(req.file)
@@ -45,7 +25,7 @@ router.put("/update", protect, upload.single("image"), async (req, res) => {
     };
 
     if (req.file) {
-      updateData.image = `http://localhost:5000/uploads/${req.file.filename}`;
+      updateData.image = `/uploads/profile/${req.file.filename}`;
     }
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {

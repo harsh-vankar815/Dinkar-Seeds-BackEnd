@@ -11,11 +11,12 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes")
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const productRoutes = require("./routes/productRoutes")
+const path = require('path')
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // serving static folder
-app.use('/uploads', express.static('uploads'))
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // middlewares
 app.use(
@@ -26,7 +27,9 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet()) // adds all default security headers
+app.use(helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" },
+})) // adds all default security headers
 // Log requests in 'dev' format
 app.use(morgan("dev"));
 

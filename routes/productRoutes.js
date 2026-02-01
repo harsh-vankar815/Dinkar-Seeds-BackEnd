@@ -8,12 +8,13 @@ const {
   getSingleProduct,
   updateProduct,
 } = require("../controllers/productController");
+const uploadProductImage = require("../middlewares/uploadProductImage");
 
 router.get("/", getAllProducts);
 router.get("/:id", getSingleProduct);
 
-router.post("/", protect, isAdmin, createProduct);
-router.put("/:id", protect, isAdmin, updateProduct);
+router.post("/", protect, isAdmin, uploadProductImage.single("image"), createProduct);
+router.put("/:id", protect, isAdmin, uploadProductImage.single("image"), updateProduct);
 router.delete("/:id", protect, isAdmin, deleteProduct);
 
 module.exports = router;

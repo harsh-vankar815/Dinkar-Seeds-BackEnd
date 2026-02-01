@@ -23,13 +23,13 @@ exports.googleAuthSuccess = (req, res) => {
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: NODE_ENV === "production" ? "none" : "lax",
     // sameSite: "None", // Required for cross-site (Render/Cloud)
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
   // redirect to frontned profile page
-  res.redirect(`${process.env.CLIENT_URL}/profile`);
+  res.redirect(`${process.env.CLIENT_URL}/auth/success`);
 };
 
 // register api
@@ -107,7 +107,7 @@ exports.login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: NODE_ENV === "production", // Sirf production (HTTPS) par true hoga
-      sameSite: "strict",
+      sameSite: NODE_ENV === "production" ? "none" : "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -145,7 +145,7 @@ exports.refreshToken = async (req, res) => {
 
     const newAccessToken = generateAccessToken(user);
 
-    res.json({ accesstoken: newAccessToken });
+    res.json({ accessToken: newAccessToken });
   } catch (err) {
     console.error(`refresh token error: ${err}`);
     return res.status(403).json({ message: "Invalid refresh token" });
@@ -156,7 +156,7 @@ exports.refreshToken = async (req, res) => {
 exports.logout = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    sameSite: "strict",
+    sameSite: NODE_ENV === "production" ? "none" : "lax",
   });
 
   res.json({ success: true, message: "Logged out successfully" });
