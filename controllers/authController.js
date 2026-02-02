@@ -18,6 +18,7 @@ exports.googleAuthSuccess = (req, res) => {
   }
 
   const refreshToken = generateRefreshToken(user);
+  // const accessToken = generateAccessToken(user)
 
   // saving securely refresh token in httpOnly cookies
   res.cookie("refreshToken", refreshToken, {
@@ -29,7 +30,9 @@ exports.googleAuthSuccess = (req, res) => {
   });
 
   // redirect to frontned profile page
-  res.redirect(`${process.env.CLIENT_URL}/auth/success`);
+  res.redirect(
+    `${process.env.CLIENT_URL}/auth/success`
+  );
 };
 
 // register api
@@ -140,12 +143,12 @@ exports.refreshToken = async (req, res) => {
   try {
     const decoded = jwt.verify(token, JWT_REFRESH_TOKEN);
 
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const newAccessToken = generateAccessToken(user);
 
-    res.json({ accessToken: newAccessToken });
+    res.json({ accessToken: newAccessToken, user });
   } catch (err) {
     console.error(`refresh token error: ${err}`);
     return res.status(403).json({ message: "Invalid refresh token" });

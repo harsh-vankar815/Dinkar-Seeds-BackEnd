@@ -29,6 +29,7 @@ passport.use(
             firstName: profile.name.givenName,
             lastName: profile.name.familyName || "",
             email,
+            image: profile.photos?.[0]?.value || "",
             googleId: profile.id,
           });
         }
