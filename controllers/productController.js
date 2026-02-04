@@ -10,11 +10,10 @@ exports.createProduct = async (req, res) => {
       createdBy: req.user.id,
     };
 
-    if (req.body.details)
-  productData.details = JSON.parse(req.body.details);
+    if (req.body.details) productData.details = JSON.parse(req.body.details);
 
-if (req.body.specifications)
-  productData.specifications = JSON.parse(req.body.specifications);
+    if (req.body.specifications)
+      productData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
       productData.img = `/uploads/products/${req.file.filename}`;
@@ -90,28 +89,29 @@ exports.updateProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    
-    const updatedData = {
-      ...req.body,
-      price: Number(req.body.price),
-      discount: Number(req.body.discount),
-    };
 
-     // parse nested objects
-    if (req.body.details)
-      updatedData.details = JSON.parse(req.body.details);
+    const updatedData = {...req.body}
+
+    if (req.body.price) updatedData.price = Number(req.body.price);
+    if (req.body.discount) updatedData.discount = Number(req.body.discount);
+
+    // parse nested objects
+    if (req.body.details) updatedData.details = JSON.parse(req.body.details);
 
     if (req.body.specifications)
       updatedData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
       updatedData.img = `/uploads/products/${req.file.filename}`;
+    } else if (req.body.img) {
+      // Agar file nahi hai par URL string aayi hai body mein
+      updatedData.img = req.body.img;
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       updatedData,
-      { new: true }
+      { new: true },
     );
 
     res.json({

@@ -13,8 +13,8 @@ const uploadProductImage = require("../middlewares/uploadProductImage");
 router.get("/", getAllProducts);
 router.get("/:id", getSingleProduct);
 
-router.post("/", protect, isAdmin, uploadProductImage.single("image"), createProduct);
-router.put("/:id", protect, isAdmin, uploadProductImage.single("image"), updateProduct);
+router.post("/", protect, isAdmin, uploadProductImage.single("img"), createProduct);
+router.put("/:id", protect, isAdmin, uploadProductImage.single("img"), updateProduct);
 router.delete("/:id", protect, isAdmin, deleteProduct);
 
 module.exports = router;
