@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes")
+const galleryRoutes = require("./routes/galleryRoutes")
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const productRoutes = require("./routes/productRoutes")
 const path = require('path')
@@ -38,6 +39,7 @@ app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes)
 app.use("/api/products", productRoutes)
+app.use("/api/gallery", galleryRoutes)
 
 // error middleware (last me)
 app.use(errorHandler);
