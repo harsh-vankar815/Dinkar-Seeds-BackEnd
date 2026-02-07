@@ -10,6 +10,7 @@ const passport = require("passport");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes")
 const galleryRoutes = require("./routes/galleryRoutes")
+const chatRoutes = require("./routes/chatRoutes")
 const { errorHandler } = require("./middlewares/errorMiddleware");
 const productRoutes = require("./routes/productRoutes")
 const path = require('path')
@@ -40,6 +41,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", userRoutes)
 app.use("/api/products", productRoutes)
 app.use("/api/gallery", galleryRoutes)
+app.use("/api/chat", chatRoutes)
 
 // error middleware (last me)
 app.use(errorHandler);
