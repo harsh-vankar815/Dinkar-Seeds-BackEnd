@@ -18,14 +18,12 @@ exports.googleAuthSuccess = (req, res) => {
   }
 
   const refreshToken = generateRefreshToken(user);
-  // const accessToken = generateAccessToken(user)
 
   // saving securely refresh token in httpOnly cookies
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: NODE_ENV === "production",
     sameSite: NODE_ENV === "production" ? "none" : "lax",
-    // sameSite: "None", // Required for cross-site (Render/Cloud)
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 
