@@ -3,3 +3,5 @@
 google callback url change karvi .env ma deploying time
 
 node env ko change karke production hai ya nahi vo check karlenga sari files me 
+
+.env ma client url ane callback url add karvu render pe 
