@@ -16,8 +16,8 @@ exports.createProduct = async (req, res) => {
       productData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
-      productData.img = `/uploads/products/${req.file.filename}`;
-    }
+  productData.img = req.file.path; 
+}
 
     const product = await Product.create(productData);
 
@@ -102,8 +102,8 @@ exports.updateProduct = async (req, res) => {
       updatedData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
-      updatedData.img = `/uploads/products/${req.file.filename}`;
-    } else if (req.body.img) {
+  productData.img = req.file.path; 
+}else if (req.body.img) {
       // Agar file nahi hai par URL string aayi hai body mein
       updatedData.img = req.body.img;
     }
