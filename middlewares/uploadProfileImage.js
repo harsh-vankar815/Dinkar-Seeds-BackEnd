@@ -1,29 +1,48 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // 1. Root directory se absolute path banayein
-    const rootDir = path.join(__dirname, "..", "uploads/profile");
+let storage;
 
-    // 2. Agar folder nahi hai, to create karein (recursive true nested folders ke liye)
-    if (!fs.existsSync(rootDir)) {
-      fs.mkdirSync(rootDir, { recursive: true });
-    }
+if (process.env.NODE_ENV === "production") {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
 
-    cb(null, rootDir);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${req.user._id}-${Date.now()}${path.extname(file.originalname)}`);
-  },
-});
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: "dinkar_seeds/uploads/profile",
+      resource_type: "auto",
+      public_id: (req, file) =>
+        `${Date.now()}-${file.originalname.split(".")[0]}`,
+    },
+  });
+} else {
+  storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const rootDir = path.join(__dirname, "..", "uploads/profile");
+      if (!fs.existsSync(rootDir)) {
+        fs.mkdirSync(rootDir, { recursive: true });
+      }
+      cb(null, rootDir);
+    },
+    filename: (req, file, cb) => {
+      cb(null, `${Date.now()}-${file.originalname}`);
+    },
+  });
+}
 
 const fileFilter = (req, file, cb) => {
-  if (!file.mimetype.startsWith("image")) {
-    return cb(new Error("Please upload an image"), false);
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only images allowed"), false);
   }
-  cb(null, true);
 };
 
 module.exports = multer({ storage, fileFilter });
