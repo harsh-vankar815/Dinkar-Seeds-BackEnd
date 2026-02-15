@@ -43,21 +43,33 @@ exports.deleteImage = async (req, res) => {
     const image = await Gallery.findById(req.params.id);
     if (!image) return res.status(404).json({ message: "Image not found" });
 
-    // PRODUCTION (Cloudinary Delete)
     if (process.env.NODE_ENV === "production") {
-      // URL se Public ID nikalna (e.g., dinkar_seeds/gallery/filename)
-      const publicId = image.src.split('/').slice(-3).join('/').split('.')[0];
+      // Cloudinary Delete: URL se public_id nikalna
+      // dinkar_seeds/uploads/gallery/filename
+      const parts = image.src.split('/');
+      const filenameWithExtension = parts.pop(); // filename.jpg
+      const filename = filenameWithExtension.split('.')[0]; // filename
+      const folderPath = parts.slice(-3).join('/'); // dinkar_seeds/uploads/gallery
+      const publicId = `${folderPath}/${filename}`;
+
       await cloudinary.uploader.destroy(publicId);
-      await Gallery.findByIdAndDelete(req.params.id);
     } 
-    // DEVELOPMENT (Local File Delete)
     else {
-      const filePath = path.join(__dirname, "..", image.src.replace(/^\/+/, ""));
-      if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-      await Gallery.findByIdAndDelete(req.params.id);
+      // Local Delete: /uploads/gallery/ logic
+      // __dirname se bahar nikal kar seedha root ke uploads folder tak pahunchna
+      const absolutePath = path.join(process.cwd(), image.src); 
+      
+      if (fs.existsSync(absolutePath)) {
+        fs.unlinkSync(absolutePath);
+      }
     }
 
-    res.status(200).json({ success: true, message: "Image deleted" });
+    await Gallery.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Image deleted successfully from database and storage" 
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

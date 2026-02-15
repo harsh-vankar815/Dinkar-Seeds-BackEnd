@@ -16,8 +16,8 @@ exports.createProduct = async (req, res) => {
       productData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
-  productData.img = req.file.path; 
-}
+      productData.img = req.file.path;
+    }
 
     const product = await Product.create(productData);
 
@@ -90,7 +90,7 @@ exports.updateProduct = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    const updatedData = {...req.body}
+    const updatedData = { ...req.body };
 
     if (req.body.price) updatedData.price = Number(req.body.price);
     if (req.body.discount) updatedData.discount = Number(req.body.discount);
@@ -102,8 +102,8 @@ exports.updateProduct = async (req, res) => {
       updatedData.specifications = JSON.parse(req.body.specifications);
 
     if (req.file) {
-  productData.img = req.file.path; 
-}else if (req.body.img) {
+      updatedData.img = req.file.path;
+    } else if (req.body.img) {
       // Agar file nahi hai par URL string aayi hai body mein
       updatedData.img = req.body.img;
     }
